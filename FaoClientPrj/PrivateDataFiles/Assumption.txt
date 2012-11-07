@@ -1,0 +1,4 @@
+1.Main Table : The table whose rows will be filled by one XML page.
+2.Link Type : Either (1== Not a Main Table) or  0 = MainTable
+3.Every table which is not a main table use the first colum of the main table and use it to produce it's url and also binds this value to the last column of the table.
+4.All the data in the tables are being inserted only by the table itself.
