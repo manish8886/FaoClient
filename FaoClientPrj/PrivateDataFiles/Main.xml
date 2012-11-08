@@ -1,65 +1,65 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <schema>
-<table name="Countries" >
-<col id="1" type="string">	codeISO3 </col id="1">
-<col id="2" type="string">	codeISO2 </col id="2">
-<col id="3" type="string">	nameOfficialEN</col id="3">
-<col id="4	type="string">	nameShortEN	</col id="4>
-<col id="5"	type="string">	nameListEN 	</col id="5">
+<table name="Countries">
+<col id="1" type="string">	codeISO3 </col>
+<col id="2" type="string">	codeISO2 </col>
+<col id="3" type="string">	nameOfficialEN</col>
+<col id="4"	type="string">	nameShortEN	</col>
+<col id="5"	type="string">	nameListEN 	</col>
 <sourcenode></sourcenode>
 <link type='0'>http://www.fao.org/countryprofiles/geoinfo/ws/allCountries/EN/</link>
 </table>
 <table name="CoOrdinates" >
-<col id="1" type="real">	hasMaxLatitude  </col id="1">
-<col id="2"	type="real">	hasMaxLongitude </col id="2">
-<col id="3"	type="real">	hasMinLatitude	</col id="3">
-<col id="4"	type="real">	hasMinLongitude	</col id="4">
-<col id="5" type="string">	codeISO3 		</col id="5">
+<col id="1" type="real">	hasMaxLatitude  </col>
+<col id="2"	type="real">	hasMaxLongitude </col>
+<col id="3"	type="real">	hasMinLatitude	</col>
+<col id="4"	type="real">	hasMinLongitude	</col>
+<col id="5" type="string">	codeISO3 		</col>
 <sourcenode></sourcenode>
 <link type='1' tableName = "Countries" fieldId= "1" bindId="5">http://www.fao.org/countryprofiles/geoinfo/ws/countryCoordinates/</link>
 </table>
 <table name="GDP" >
-<col id="1" type="string">	Notes 		</col id="1">
-<col id="2" type="real">	TotalInCurrentPrices  </col id="2">
-<col id="3" type="string">	Unit 	</col id="3">
-<col id="4" type="number">	Year		</col id="4">
-<col id="5" type="string">	codeISO3 		</col id="5">
+<col id="1" type="string">	Notes 		</col>
+<col id="2" type="real">	TotalInCurrentPrices  </col>
+<col id="3" type="string">	Unit 	</col>
+<col id="4" type="number">	Year		</col>
+<col id="5" type="string">	codeISO3 		</col>
 <sourcenode></sourcenode>
 <link type='1' tableName = "Countries" fieldId= "1" bindId="5">www.fao.org/countryprofiles/geoinfo/ws/countryStatistics/GDP/</link>
 </table>
 <table name="Populations" >
-<col id="1" type="string">	Notes 		</col id="1">
-<col id="2" type="real">	Total 		</col id="2">
-<col id="3" type="string">	Unit 		</col id="3">
-<col id="4" type="number">	Year 		</col id="4">
-<col id="5" type="string">	codeISO3 		</col id="5">
+<col id="1" type="string">	Notes 		</col>
+<col id="2" type="real">	Total 		</col>
+<col id="3" type="string">	Unit 		</col>
+<col id="4" type="number">	Year 		</col>
+<col id="5" type="string">	codeISO3 		</col>
 <sourcenode></sourcenode>
 <link type='1' tableName = "Countries" fieldId= "1" bindId="5">www.fao.org/countryprofiles/geoinfo/ws/countryStatistics/population/</link>
 </table>
 <table name="Area" >
-<col id="1" type="string">	Notes 		</col id="1">
-<col id="2" type="real">	Total 		</col id="2">
-<col id="3" type="string">	Unit 		</col id="3">
-<col id="4" type="number">	Year 		</col id="4">
-<col id="5" type="string">	codeISO3 		</col id="5">
+<col id="1" type="string">	Notes 		</col>
+<col id="2" type="real">	Total 		</col>
+<col id="3" type="string">	Unit 		</col>
+<col id="4" type="number">	Year 		</col>
+<col id="5" type="string">	codeISO3 		</col>
 <sourcenode></sourcenode>
 <link type='1' tableName = "Countries" fieldId= "1" bindId="5">www.fao.org/countryprofiles/geoinfo/ws/countryStatistics/countryArea/</link>
 </table>
 <table name="LandArea" >
-<col id="1" type="string">	Notes 		</col id="1">
-<col id="2" type="real">	Total 		</col id="2">
-<col id="3" type="string">	Unit 		</col id="3">
-<col id="4" type="number">	Year 		</col id="4">
-<col id="5" type="string">	codeISO3 		</col id="5">
+<col id="1" type="string">	Notes 		</col>
+<col id="2" type="real">	Total 		</col>
+<col id="3" type="string">	Unit 		</col>
+<col id="4" type="number">	Year 		</col>
+<col id="5" type="string">	codeISO3 		</col>
 <sourcenode></sourcenode>
 <link type='1' tableName = "Countries" fieldId= "1" bindId="5">www.fao.org/countryprofiles/geoinfo/ws/countryStatistics/landArea/</link>
 </table>
 <table name="AgriCultureArea" >
-<col id="1" type="string">	Notes 		</col id="1">
-<col id="2" type="real">	Total 		</col id="2">
-<col id="3" type="string">	Unit 		</col id="3">
-<col id="4" type="number">	Year 		</col id="4">
-<col id="5" type="string">	codeISO3 	</col id="5">
+<col id="1" type="string">	Notes 		</col>
+<col id="2" type="real">	Total 		</col>
+<col id="3" type="string">	Unit 		</col>
+<col id="4" type="number">	Year 		</col>
+<col id="5" type="string">	codeISO3 	</col>
 <sourcenode></sourcenode>
 <link type='1' tableName = "Countries" fieldId= "1" bindId="5">www.fao.org/countryprofiles/geoinfo/ws/countryStatistics/agriculturalArea/</link>
 </table>

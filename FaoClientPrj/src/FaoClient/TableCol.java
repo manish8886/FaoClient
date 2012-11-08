@@ -13,6 +13,18 @@ public class TableCol {
        private  int ColID;
        private ColType DataType;
        private String ColName;
+       public static String GetTypeString(ColType T){
+            switch(T){
+                case INTEGERT:{
+                    return "integer";
+                }
+                case STRINGT:
+                    return "text";
+                default: 
+                        return "";
+                }
+
+       }
        public TableCol(int id,ColType type, String Name){
            ColID = id;
            DataType = type;
