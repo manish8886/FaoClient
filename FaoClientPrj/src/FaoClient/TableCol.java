@@ -3,13 +3,12 @@
  * and open the template in the editor.
  */
 package FaoClient;
-
 /**
  *
- * @author dell
+ * @author Manish Jain
  */
 public class TableCol {
-       enum ColType{INTEGERT,STRINGT};   
+       enum ColType{INTEGERT,STRINGT,REALT};   
        private  int ColID;
        private ColType DataType;
        private String ColName;
@@ -20,6 +19,8 @@ public class TableCol {
                 }
                 case STRINGT:
                     return "text";
+                case REALT:
+                    return "real";
                 default: 
                         return "";
                 }

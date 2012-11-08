@@ -32,7 +32,7 @@
 <col id="2" type="real">	Total 		</col>
 <col id="3" type="string">	Unit 		</col>
 <col id="4" type="number">	Year 		</col>
-<col id="5" type="string">	codeISO3 		</col>
+<col id="5" type="string">	codeISO3 	</col>
 <sourcenode></sourcenode>
 <link type='1' tableName = "Countries" fieldId= "1" bindId="5">www.fao.org/countryprofiles/geoinfo/ws/countryStatistics/population/</link>
 </table>
