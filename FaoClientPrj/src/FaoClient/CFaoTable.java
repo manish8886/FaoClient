@@ -39,9 +39,14 @@ public class CFaoTable {
         Type = SourceType.Partial; //Means the URL of the Data Source is not Complete
     }
 
-    String GetTableName(){
+    void SetEngineInstance(IFaoTableEngine engine) {
+        IEngine = engine;
+    }
+
+    String GetTableName() {
         return Name;
     }
+
     void SetTableName(String str) {
         Name = str;
     }
@@ -64,7 +69,7 @@ public class CFaoTable {
         }
     }
 
-    void CreateTable(Connection conn) {
+    boolean CreateTable(Connection conn) {
         try {
             Statement st = conn.createStatement();
             String QueryVal = "create table " + Name + "(";
@@ -80,12 +85,26 @@ public class CFaoTable {
             }
             st.executeUpdate(QueryVal);
             st.close();
+            return true;
         } catch (SQLException E) {
             System.out.println("Error in Creating the Table in to table: " + Name + E);
+            return false;
         }
     }
 
-    private void InsertFromPartialSource(Connection conn, SAXReader reader) {
+    public boolean StartLogging(Connection conn, SAXReader reader) {
+        if (SrcNodeXML == "" || DataUrl == "") {
+            return false;
+        }
+        if (Type == CFaoTable.SourceType.Full) {
+            return InsertFromFullSource(conn, reader);
+        } else {
+            return InsertFromPartialSource(conn, reader);
+        }
+
+    }
+
+    private boolean InsertFromPartialSource(Connection conn, SAXReader reader) {
         try {
             String SrcTblName = IEngine.GetSourceTableName();
             String srcColName = Columns.get(Columns.size() - 1).GetColName();
@@ -106,6 +125,9 @@ public class CFaoTable {
                 //Now be patient, the thing is that every link might not be reachable so check for that    
                 //first and then proceed.
                 HttpURLConnection connection = (HttpURLConnection) new URL(strRowLink).openConnection();
+                if (connection == null) {
+                    continue;
+                }
                 connection.setRequestMethod("HEAD");
                 int responseCode = connection.getResponseCode();
                 if (responseCode != 200) {
@@ -117,18 +139,29 @@ public class CFaoTable {
                 //columns excluding the last col
                 Document doc = reader.read(strRowLink);
                 Node rowNode = doc.selectSingleNode(xPath);
+                if (rowNode == null) {//check the next node
+                    continue;
+                }
                 for (int index = 0; index < Columns.size(); index++) {
                     TableCol col = Columns.get(index);
                     String colVal = "";
                     if (index != Columns.size() - 1) {
-                        colVal = rowNode.selectSingleNode(col.GetColName()).getText();
+                        Node colNode = rowNode.selectSingleNode(col.GetColName());
+                        if (colNode != null) {
+                            colVal = colNode.getText();
+                        }
                     } else {
                         colVal = linkField;
                     }
-                    ps.setObject(index + 1, colVal);
+                    if (colVal != "") {
+                        ps.setObject(index + 1, colVal);
+                    } else {
+                        ps.setNull(index+1, TableCol.GetSqlColTypeFrmType(col.GetColType()));
+                    }
+                    
                 }
                 rowCount++;
-                ps.addBatch();
+                 ps.addBatch();
                 if (rowCount % 100 == 0) {
                     ps.executeBatch();
                 }
@@ -139,20 +172,28 @@ public class CFaoTable {
             conn.commit();
             ps.close();
             st.close();
+            return true;
         } catch (SQLException E) {
             System.out.println("Error in insert in to table: " + Name + E);
+            return false;
         } catch (DocumentException E) {
             System.out.println("Error in opening the url in InsertFromPartialSource Fun: " + E);
+            return false;
         } catch (MalformedURLException e) {
             System.out.println("URL field is not proper " + e);
+            return false;
 
         } catch (IOException e) {
             System.out.println("Link is not responding" + e);
+            return false;
+        } catch (NullPointerException E) {
+            System.out.println("Null Pointer Exception in PartialInsert" + E);
+            return false;
         }
 
     }
 
-    private void InsertFromFullSource(Connection conn, SAXReader reader) {
+    private boolean InsertFromFullSource(Connection conn, SAXReader reader) {
         try {
             Document doc = reader.read(DataUrl);
             String xPath = "//" + SrcNodeXML;
@@ -179,10 +220,13 @@ public class CFaoTable {
             }
             conn.commit();
             ps.close();
+            return true;
         } catch (SQLException E) {
             System.out.println("Error in insert in to table: " + Name + E);
+            return false;
         } catch (DocumentException E) {
             System.out.println("Error in opening the url in insertFromFullSrc Fun: " + E);
+            return false;
         }
     }
 

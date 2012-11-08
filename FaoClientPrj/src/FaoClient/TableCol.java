@@ -40,6 +40,20 @@ public class TableCol {
         }
 
     }
+        public static int GetSqlColTypeFrmType(ColType T) {
+        switch (T) {
+            case INTEGERT: {
+                return java.sql.Types.INTEGER;
+            }
+            case STRINGT:
+                return java.sql.Types.VARCHAR;
+            case REALT:
+                return java.sql.Types.FLOAT;
+            default:
+                return java.sql.Types.NULL;
+        }
+
+    }
        
        public TableCol(int id,ColType type, String Name){
            ColID = id;
