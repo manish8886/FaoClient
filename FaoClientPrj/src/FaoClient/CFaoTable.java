@@ -39,6 +39,9 @@ public class CFaoTable {
         Type = SourceType.Partial; //Means the URL of the Data Source is not Complete
     }
 
+    String GetTableName(){
+        return Name;
+    }
     void SetTableName(String str) {
         Name = str;
     }
@@ -82,7 +85,7 @@ public class CFaoTable {
         }
     }
 
-    void InsertFromPartialSource(Connection conn, SAXReader reader) {
+    private void InsertFromPartialSource(Connection conn, SAXReader reader) {
         try {
             String SrcTblName = IEngine.GetSourceTableName();
             String srcColName = Columns.get(Columns.size() - 1).GetColName();
@@ -149,7 +152,7 @@ public class CFaoTable {
 
     }
 
-    void InsertFromFullSource(Connection conn, SAXReader reader) {
+    private void InsertFromFullSource(Connection conn, SAXReader reader) {
         try {
             Document doc = reader.read(DataUrl);
             String xPath = "//" + SrcNodeXML;

@@ -8,7 +8,7 @@ package FaoClient;
  * @author Manish Jain
  */
 public class TableCol {
-       enum ColType{INTEGERT,STRINGT,REALT};   
+       enum ColType{NOTYPET,INTEGERT,STRINGT,REALT};   
        private  int ColID;
        private ColType DataType;
        private String ColName;
@@ -26,6 +26,21 @@ public class TableCol {
                 }
 
        }
+    public static ColType GetColTypeFrmString(String T) {
+        switch (T) {
+            case "integer": {
+                return ColType.INTEGERT;
+            }
+            case "string":
+                return ColType.STRINGT;
+            case "real":
+                return ColType.REALT;
+            default:
+                return ColType.NOTYPET;
+        }
+
+    }
+       
        public TableCol(int id,ColType type, String Name){
            ColID = id;
            DataType = type;
