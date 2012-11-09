@@ -9,7 +9,6 @@
 <sourcenode>self_governing</sourcenode>
 <link type='0'>http://www.fao.org/countryprofiles/geoinfo/ws/allCountries/EN/</link>
 </table>
-
 <table name="CoOrdinates" >
 <col id="1" type="real">hasMaxLatitude</col>
 <col id="2"	type="real">hasMaxLongitude</col>
@@ -54,5 +53,14 @@
 <col id="5" type="string">codeISO3</col>
 <sourcenode>agriculturalArea</sourcenode>
 <link type='1' tableName = "Countries" fieldId= "1" bindId="5">http://www.fao.org/countryprofiles/geoinfo/ws/countryStatistics/agriculturalArea/</link>
+</table>
+<table name="GDP" >
+<col id="1" type="string">GDPNotes</col>
+<col id="2" type="real">GDPTotalInCurrentPrices</col>
+<col id="3" type="string">GDPUnit</col>
+<col id="4" type="integer">GDPYear</col>
+<col id="5" type="string">codeISO3</col>
+<sourcenode>GDP</sourcenode>
+<link type='1' tableName = "Countries" fieldId= "1" bindId="5">http://www.fao.org/countryprofiles/geoinfo/ws/countryStatistics/GDP/</link>
 </table>
 </schema>
