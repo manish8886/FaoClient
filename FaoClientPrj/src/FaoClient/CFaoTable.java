@@ -71,6 +71,7 @@ public class CFaoTable {
 
     boolean CreateTable(Connection conn) {
         try {
+            System.out.println("Creating table with name: "+Name);
             Statement st = conn.createStatement();
             String QueryVal = "create table " + Name + "(";
             for (int index = 0; index < Columns.size(); index++) {
@@ -84,10 +85,11 @@ public class CFaoTable {
                 }
             }
             st.executeUpdate(QueryVal);
+            System.out.println("Table "+Name+" has been created");
             st.close();
             return true;
         } catch (SQLException E) {
-            System.out.println("Error in Creating the Table in to table: " + Name + E);
+            System.out.println("Creation of "+ Name +" has failed. And application is exiting.");
             return false;
         }
     }
@@ -106,6 +108,9 @@ public class CFaoTable {
 
     private boolean InsertFromPartialSource(Connection conn, SAXReader reader) {
         try {
+            if (conn == null || reader == null) {
+                return false;
+            }
             String SrcTblName = IEngine.GetSourceTableName();
             String srcColName = Columns.get(Columns.size() - 1).GetColName();
             //Partial means, that this table's data link is not complete, and this
@@ -116,7 +121,8 @@ public class CFaoTable {
             Statement st = conn.createStatement();
             ResultSet result = st.executeQuery(selectQuery);
             conn.setAutoCommit(false);
-            PreparedStatement ps = conn.prepareStatement(CreatePreparedInsertStatement());
+            String strPs= CreatePreparedInsertStatement();
+            PreparedStatement ps = conn.prepareStatement(strPs);
             String xPath = "//" + SrcNodeXML;
             int rowCount = 0;
             while (result.next()) {
@@ -153,41 +159,46 @@ public class CFaoTable {
                     } else {
                         colVal = linkField;
                     }
-                    if (colVal != "") {
-                        ps.setObject(index + 1, colVal);
-                    } else {
-                        ps.setNull(index+1, TableCol.GetSqlColTypeFrmType(col.GetColType()));
+                    if (!BindValueToStmt(ps, index + 1, col.GetColType(), colVal)) {
+                        ps.setNull(index + 1, TableCol.GetSqlColTypeFrmType(col.GetColType()));
                     }
-                    
                 }
                 rowCount++;
-                 ps.addBatch();
+                ps.addBatch();
                 if (rowCount % 100 == 0) {
                     ps.executeBatch();
+                    conn.commit();
+                    conn.setAutoCommit(false);
                 }
             }
             if (rowCount > 0) {
-                int RecordsUpdated[] = ps.executeBatch();
+                 int[]updateCount = ps.executeBatch();
             }
             conn.commit();
+            conn.setAutoCommit(true);
             ps.close();
             st.close();
             return true;
         } catch (SQLException E) {
             System.out.println("Error in insert in to table: " + Name + E);
+            E.printStackTrace();
             return false;
         } catch (DocumentException E) {
             System.out.println("Error in opening the url in InsertFromPartialSource Fun: " + E);
+            E.printStackTrace();
             return false;
         } catch (MalformedURLException e) {
             System.out.println("URL field is not proper " + e);
+            e.printStackTrace();
             return false;
 
         } catch (IOException e) {
             System.out.println("Link is not responding" + e);
+            e.printStackTrace();
             return false;
         } catch (NullPointerException E) {
             System.out.println("Null Pointer Exception in PartialInsert" + E);
+            E.printStackTrace();
             return false;
         }
 
@@ -231,19 +242,55 @@ public class CFaoTable {
     }
 
     private String CreatePreparedInsertStatement() {
-        String insertStmt = "insert into " + Name + "(";
+        StringBuilder insertStmt = new StringBuilder("insert into " + Name + "(");
         String val = " values (";
         for (int index = 0; index < Columns.size(); index++) {
             TableCol col = Columns.get(index);
             if (index != Columns.size() - 1) {
-                insertStmt = insertStmt + col.GetColName() + ", ";
+                String Stmt = col.GetColName() + ", ";
+                insertStmt.append(Stmt);
                 val += "?, ";
             } else {
-                insertStmt = insertStmt + col.GetColName() + ")";
+                String Stmt = col.GetColName() + ")";
+                insertStmt.append(Stmt);
                 val += "?)";
             }
         }
-        insertStmt = insertStmt + val;
-        return insertStmt;
+//        insertStmt = insertStmt + val;
+        insertStmt.append(val);
+        return insertStmt.toString();
+    }
+
+    private boolean BindValueToStmt(PreparedStatement ps, int index, TableCol.ColType type, String ColVal) {
+        if ((ps == null) || (ColVal == "")) {
+            return false;
+        }
+        try {
+            switch (type) {
+                case INTEGERT: {
+                    ps.setInt(index, Integer.parseInt(ColVal));
+                    return true;
+                }
+                case STRINGT: {
+                    ps.setString(index, ColVal);
+                    return true;
+                }
+                case REALT: {
+                    ps.setFloat(index, Float.parseFloat(ColVal));
+                    return true;
+                }
+                case DOUBLET: {
+                    ps.setDouble(index, Double.parseDouble(ColVal));
+                    return true;
+                }
+                default:
+                    ps.setNull(index, java.sql.Types.NULL);
+            }
+            return true;
+        } catch (SQLException E) {
+            System.out.println("Error in Setting the value of the col in table: " + Name + E);
+            E.printStackTrace();
+            return false;
+        }
     }
 }

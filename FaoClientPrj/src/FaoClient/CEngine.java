@@ -4,13 +4,14 @@ import java.util.List;
 import java.util.Iterator;
 import java.sql.*;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Iterator;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
 import java.util.Vector;
 import org.dom4j.Node;
-
+import java.util.Map;
 /**
  *
  * @author Manish Jain
@@ -22,6 +23,7 @@ public class CEngine implements IFaoTableEngine {
     private Vector<CFaoTable> tableCollection;
     private int iMainTblIndex;
     private String mainFileName;
+    private Map<String,Integer>existingTblMap;
     @Override
     public String GetSourceTableName() {
         return tableCollection.get(iMainTblIndex).GetTableName();
@@ -32,18 +34,20 @@ public class CEngine implements IFaoTableEngine {
         databaseConnector = null;
         tableCollection = new Vector();
         iMainTblIndex = -1;
+        existingTblMap = new HashMap<String,Integer>();
         mainFileName = "";
     }
     public static CEngine CreateEngineInstance(){
          CEngine engineInstance = new CEngine();
          return engineInstance;
     }
-    public boolean Initialise(String DataSrcName, String xmlFileName) {
+    public boolean Initialise(Connection conn, String xmlFileName) {
+        if((conn == null) || (xmlFileName == "")){
+            return false;
+        }
         boolean bSucceess = true;
-        String dbURL = "jdbc:odbc:" + DataSrcName;
         try {
-            Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-            databaseConnector = DriverManager.getConnection(dbURL);
+            databaseConnector = conn;
             xmlReader = new SAXReader();
             mainFileName = xmlFileName;//Initialise here so that if connection was failed to database, it remain uninitialised.
             if (!ParseMainFile()) {
@@ -59,6 +63,7 @@ public class CEngine implements IFaoTableEngine {
 
     public boolean Start() {
         boolean bStart = true;
+        System.out.println("Engine has started");
         //First check is everything is set up for successfully intialisation of the engine
         if (xmlReader == null || databaseConnector == null || mainFileName == "") {
             return false;//Engine unable to Start           
@@ -69,12 +74,15 @@ public class CEngine implements IFaoTableEngine {
         //First we need to create the main table and fill it up so other table can query the data.
         CFaoTable mainTable = tableCollection.get(iMainTblIndex);
         mainTable.SetEngineInstance(this);
-        if(!mainTable.CreateTable(databaseConnector)){
+
+        if (!mainTable.CreateTable(databaseConnector)) {
             return false;//Can't proceed;
         }
-        if(!mainTable.StartLogging(databaseConnector, xmlReader)){
+        if (!mainTable.StartLogging(databaseConnector, xmlReader)) {
             return false;
         }
+
+
         for(int i = 0;i<tableCollection.size();i++){
             if(i==iMainTblIndex){
                 continue;
@@ -83,7 +91,9 @@ public class CEngine implements IFaoTableEngine {
             tableOb.SetEngineInstance(this);
             if(!tableOb.CreateTable(databaseConnector))
                 continue;//Skip populating this table
+            System.out.println("Fetching the data for "+ tableOb.GetTableName()+" Table");
             tableOb.StartLogging(databaseConnector, xmlReader);
+            System.out.println("Updation of the " + tableOb.GetTableName() + " Table has finished");
         }
         return bStart;
     }
@@ -147,6 +157,25 @@ public class CEngine implements IFaoTableEngine {
                 String tableName = result.getString("TABLE_NAME");
                 String query = "drop table " + tableName + ";";
                 st.executeUpdate(query);
+            }
+            st.close();
+        } catch (SQLException E) {
+            System.out.print("Unable to Delete the table in DropAllTableFun" + E);
+        }
+    }
+        private void ScanOrDeleteDataBase(Connection conn,boolean bDelete) {
+        try {
+            Statement st = conn.createStatement();
+            DatabaseMetaData metadata = conn.getMetaData();
+            ResultSet result = metadata.getTables(null, null, "%", null);
+            while (result.next()) {
+                String tableName = result.getString("TABLE_NAME");
+                if (bDelete) {
+                    String query = "drop table " + tableName + ";";
+                    st.executeUpdate(query);
+                }else{
+                    existingTblMap.put(tableName,1);
+                }
             }
             st.close();
         } catch (SQLException E) {

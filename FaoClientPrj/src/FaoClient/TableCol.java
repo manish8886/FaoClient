@@ -8,7 +8,7 @@ package FaoClient;
  * @author Manish Jain
  */
 public class TableCol {
-       enum ColType{NOTYPET,INTEGERT,STRINGT,REALT};   
+       enum ColType{NOTYPET,INTEGERT,STRINGT,REALT,DOUBLET};   
        private  int ColID;
        private ColType DataType;
        private String ColName;
@@ -21,6 +21,8 @@ public class TableCol {
                     return "text";
                 case REALT:
                     return "real";
+                case DOUBLET:
+                    return "double";
                 default: 
                         return "";
                 }
@@ -35,6 +37,8 @@ public class TableCol {
                 return ColType.STRINGT;
             case "real":
                 return ColType.REALT;
+            case "double":
+                return ColType.DOUBLET;
             default:
                 return ColType.NOTYPET;
         }
@@ -49,6 +53,8 @@ public class TableCol {
                 return java.sql.Types.VARCHAR;
             case REALT:
                 return java.sql.Types.FLOAT;
+            case DOUBLET:
+                return java.sql.Types.DOUBLE;
             default:
                 return java.sql.Types.NULL;
         }

@@ -3,84 +3,63 @@
  * and open the template in the editor.
  */
 package FaoClient;
+
+import java.io.BufferedReader;
+import java.io.Console;
+import java.io.InputStreamReader;
 import java.sql.*;
-import java.util.Vector;
-import java.util.List;
-import java.util.Iterator;
-import java.sql.*;
-import java.net.URL;
-import java.util.Iterator;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.io.SAXReader;
-import java.util.Vector;
-import org.dom4j.Node;
 
 public class FaoClient {
-           public static void TestCase(){
-//                      Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-//            Connection con = DriverManager.getConnection(dbURL);
-//            /*
-//            Statement s = con.createStatement();
-//            s.execute("create table school2(Grade integer,Remark text)");*/
-//            TableCol col = new TableCol(1, TableCol.ColType.STRINGT,"codeISO3");
-//            Vector<TableCol>colVector = new Vector();
-//            colVector.add(col);
-//            CFaoTable tableOb = new CFaoTable();
-//            tableOb.SetColumns(colVector);
-//            tableOb.SetTableName("Countries");
-//            tableOb.SetDataSource("http://www.fao.org/countryprofiles/geoinfo/ws/allCountries/EN/");
-//            tableOb.SetSourceType(CFaoTable.SourceType.Full);
-//            tableOb.SetSourceNode("self_governing");
-//            
-//            /*Here Testing code for Partial Table*/
-//            TableCol col1 = new TableCol(1, TableCol.ColType.REALT, "hasMaxLatitude");
-//            TableCol col2 = new TableCol(2, TableCol.ColType.STRINGT,"codeISO3");
-//            Vector<TableCol> colVector1 = new Vector();
-//            colVector1.add(col1);
-//            colVector1.add(col2);
-//            CFaoTable tableOb1 = new CFaoTable();
-//            tableOb1.SetColumns(colVector1);
-//            tableOb1.SetTableName("CoOrdinates");
-//            tableOb1.SetDataSource("http://www.fao.org/countryprofiles/geoinfo/ws/countryCoordinates/");
-//            tableOb1.SetSourceType(CFaoTable.SourceType.Partial);
-//            tableOb1.SetSourceNode("Data");
-//            SAXReader reader = new SAXReader();
-//            DropAllTableInDataBase(con);
-//            tableOb.CreateTable(con);
-//            tableOb.InsertFromFullSource(con, reader);
-//            Engine faoEngine = new FaoClient().new Engine();
-//            faoEngine.strSrcTblName = "Countries";
-//            tableOb1.IEngine = faoEngine;
-//            tableOb1.CreateTable(con);
-//            tableOb1.InsertFromPartialSource(con, reader);
-//
-//            con.close();   
-        }
-    public static void DropAllTableInDataBase(Connection conn){
-        try{
-                Statement st = conn.createStatement();
-               DatabaseMetaData metadata=  conn.getMetaData();
-              ResultSet result= metadata.getTables(null, null, "%", null);
-              while(result.next()){
-                 String tableName =result.getString("TABLE_NAME");
-                 String query = "drop table "+tableName+";";
-                 st.executeUpdate(query);
-             }
-                st.close();
-        }
-        catch(SQLException E){
-            System.out.print("Unable to Delete the table in DropAllTableFun"+E);
+
+    public static void DropAllTableInDataBase(Connection conn) {
+        try {
+            Statement st = conn.createStatement();
+            DatabaseMetaData metadata = conn.getMetaData();
+            ResultSet result = metadata.getTables(null, null, "%", null);
+            while (result.next()) {
+                String tableName = result.getString("TABLE_NAME");
+                String query = "drop table " + tableName + ";";
+                st.executeUpdate(query);
+            }
+            st.close();
+        } catch (SQLException E) {
+            System.out.print("Unable to Delete the table in DropAllTableFun" + E);
         }
     }
+
     public static void main(String[] args) {
-        String dataSourceName = "testMyDB";
-        String dbURL = "jdbc:odbc:"+dataSourceName;
-        CEngine engineInst = CEngine.CreateEngineInstance();
-        if(engineInst.Initialise(dataSourceName, "E:\\Data\\Study\\Home\\DIC_PROJ1\\FaoClient\\FaoClientPrj\\PrivateDataFiles\\Main.xml")){
-            engineInst.Start();
+        try {
+            BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("Enter the Hostname:");
+            String hostname = console.readLine();
+            System.out.println("Enter the Portnumber:");
+            String portnumber = console.readLine();
+            System.out.println("Enter the Databasename from which you want to connect:");
+            String dbName = console.readLine();
+            System.out.println("Enter User Name for the database:");
+            String userName = console.readLine();
+            System.out.println("Enter Password:");
+            String passWord = console.readLine();
+//            System.out.println("Do you want to delete existing tables");
+//            String strDeletion = console.readLine();
+            String strDbLocation = "jdbc:mysql://";
+            Connection conn;
+            Class.forName("com.mysql.jdbc.Driver");
+            strDbLocation = strDbLocation + hostname + ":" + portnumber + "/" + dbName;
+            String strPassWord = new String(passWord);
+            conn = DriverManager.getConnection(strDbLocation, userName, strPassWord);
+            CEngine engineInst = CEngine.CreateEngineInstance();
+            if (engineInst.Initialise(conn, "E:\\Data\\Study\\Home\\DIC_PROJ1\\FaoClient\\FaoClientPrj\\PrivateDataFiles\\Main.xml")) {
+                boolean bSuccess = engineInst.Start();
+                if (bSuccess) {
+                    System.out.println("All data has been stored in the database");
+                }
+            }
+        } catch (Exception E) {
+            System.out.println("Unable to connect to database" + E);
+            return;
         }
-        
-        }
-        
+
+
     }
+}
