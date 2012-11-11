@@ -18,7 +18,7 @@ public class TableCol {
                     return "integer";
                 }
                 case STRINGT:
-                    return "text";
+                    return "varchar(512)";
                 case REALT:
                     return "real";
                 case DOUBLET:
