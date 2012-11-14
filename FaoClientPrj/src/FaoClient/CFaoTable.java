@@ -144,31 +144,39 @@ public class CFaoTable {
                 //Now after implementing the link we need to query the row data for the
                 //columns excluding the last col
                 Document doc = reader.read(strRowLink);
-                Node rowNode = doc.selectSingleNode(xPath);
-                if (rowNode == null) {//check the next node
-                    continue;
-                }
-                for (int index = 0; index < Columns.size(); index++) {
-                    TableCol col = Columns.get(index);
-                    String colVal = "";
-                    if (index != Columns.size() - 1) {
-                        Node colNode = rowNode.selectSingleNode(col.GetColName());
-                        if (colNode != null) {
-                            colVal = colNode.getText();
+                List listOfNode = doc.selectNodes(xPath);
+                Iterator iter = listOfNode.iterator();
+                while (iter.hasNext()) {
+//                Node rowNode = doc.selectSingleNode(xPath);
+                    Node rowNode = (Node) iter.next();
+                    if (rowNode == null) {//check the next node
+                        continue;
+                    }
+                    for (int index = 0; index < Columns.size(); index++) {
+                        TableCol col = Columns.get(index);
+                        String colVal = "";
+                        if(col.IsAutoIncr()){
+                            colVal = colVal+(rowCount+1);
                         }
-                    } else {
-                        colVal = linkField;
+                        else if (index != Columns.size() - 1) {
+                            Node colNode = rowNode.selectSingleNode(col.GetColName());
+                            if (colNode != null) {
+                                colVal = colNode.getText();
+                            }
+                        } else {
+                            colVal = linkField;
+                        }
+                        if (!BindValueToStmt(ps, index + 1, col.GetColType(), colVal)) {
+                            ps.setNull(index + 1, TableCol.GetSqlColTypeFrmType(col.GetColType()));
+                        }
                     }
-                    if (!BindValueToStmt(ps, index + 1, col.GetColType(), colVal)) {
-                        ps.setNull(index + 1, TableCol.GetSqlColTypeFrmType(col.GetColType()));
+                    rowCount++;
+                    ps.addBatch();
+                    if (rowCount % 100 == 0) {
+                        ps.executeBatch();
+                        conn.commit();
+                        conn.setAutoCommit(false);
                     }
-                }
-                rowCount++;
-                ps.addBatch();
-                if (rowCount % 100 == 0) {
-                    ps.executeBatch();
-                    conn.commit();
-                    conn.setAutoCommit(false);
                 }
             }
             if (rowCount > 0) {
