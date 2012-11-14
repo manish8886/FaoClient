@@ -118,7 +118,12 @@ public class CEngine implements IFaoTableEngine {
                     String strName = colNode.getText();
                     String strID = colNode.selectSingleNode("@id").getText();
                     String strType = colNode.selectSingleNode("@type").getText();
-                    TableCol col = new TableCol(Integer.parseInt(strID), TableCol.GetColTypeFrmString(strType), strName);
+                    String strIncr = colNode.selectSingleNode("@autoIncr").getText();
+                    boolean bAutoInCr = false;
+                    if (Integer.parseInt(strIncr) ==1) {
+                        bAutoInCr = true;
+                    }
+                    TableCol col = new TableCol(Integer.parseInt(strID), TableCol.GetColTypeFrmString(strType), strName,bAutoInCr);
                     colVector.add(col);
                 }
                 //Now get sourceNode 
