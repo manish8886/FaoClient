@@ -11,6 +11,7 @@ public class TableCol {
        enum ColType{NOTYPET,INTEGERT,STRINGT,REALT,DOUBLET};   
        private  int ColID;
        private ColType DataType;
+       private boolean bAutoIncr;
        private String ColName;
        public static String GetTypeString(ColType T){
             switch(T){
@@ -61,10 +62,15 @@ public class TableCol {
 
     }
        
-       public TableCol(int id,ColType type, String Name){
+       public TableCol(int id,ColType type, String Name,boolean b){
            ColID = id;
            DataType = type;
            ColName = Name;
+           bAutoIncr = b;
+           
+       }
+       public boolean IsAutoIncr(){
+           return bAutoIncr;
        }
        public int GetColID(){
             return ColID;
