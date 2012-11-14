@@ -12,6 +12,7 @@ import org.dom4j.io.SAXReader;
 import java.util.Vector;
 import org.dom4j.Node;
 import java.util.Map;
+
 /**
  *
  * @author Manish Jain
@@ -23,7 +24,8 @@ public class CEngine implements IFaoTableEngine {
     private Vector<CFaoTable> tableCollection;
     private int iMainTblIndex;
     private String mainFileName;
-    private Map<String,Integer>existingTblMap;
+    private Map<String, Integer> existingTblMap;
+
     @Override
     public String GetSourceTableName() {
         return tableCollection.get(iMainTblIndex).GetTableName();
@@ -34,15 +36,17 @@ public class CEngine implements IFaoTableEngine {
         databaseConnector = null;
         tableCollection = new Vector();
         iMainTblIndex = -1;
-        existingTblMap = new HashMap<String,Integer>();
+        existingTblMap = new HashMap<String, Integer>();
         mainFileName = "";
     }
-    public static CEngine CreateEngineInstance(){
-         CEngine engineInstance = new CEngine();
-         return engineInstance;
+
+    public static CEngine CreateEngineInstance() {
+        CEngine engineInstance = new CEngine();
+        return engineInstance;
     }
+
     public boolean Initialise(Connection conn, String xmlFileName) {
-        if((conn == null) || (xmlFileName == "")){
+        if ((conn == null) || (xmlFileName == "")) {
             return false;
         }
         boolean bSucceess = true;
@@ -83,15 +87,16 @@ public class CEngine implements IFaoTableEngine {
         }
 
 
-        for(int i = 0;i<tableCollection.size();i++){
-            if(i==iMainTblIndex){
+        for (int i = 0; i < tableCollection.size(); i++) {
+            if (i == iMainTblIndex) {
                 continue;
             }
             CFaoTable tableOb = tableCollection.get(i);
             tableOb.SetEngineInstance(this);
-            if(!tableOb.CreateTable(databaseConnector))
+            if (!tableOb.CreateTable(databaseConnector)) {
                 continue;//Skip populating this table
-            System.out.println("Fetching the data for "+ tableOb.GetTableName()+" Table");
+            }
+            System.out.println("Fetching the data for " + tableOb.GetTableName() + " Table");
             tableOb.StartLogging(databaseConnector, xmlReader);
             System.out.println("Updation of the " + tableOb.GetTableName() + " Table has finished");
         }
@@ -118,12 +123,16 @@ public class CEngine implements IFaoTableEngine {
                     String strName = colNode.getText();
                     String strID = colNode.selectSingleNode("@id").getText();
                     String strType = colNode.selectSingleNode("@type").getText();
-                    String strIncr = colNode.selectSingleNode("@autoIncr").getText();
+                    Node autoNode = colNode.selectSingleNode("@autoIncr");
+                    String strIncr = "0";
+                    if (autoNode != null) {
+                        strIncr = autoNode.getText();
+                    }
                     boolean bAutoInCr = false;
-                    if (Integer.parseInt(strIncr) ==1) {
+                    if (Integer.parseInt(strIncr) == 1) {
                         bAutoInCr = true;
                     }
-                    TableCol col = new TableCol(Integer.parseInt(strID), TableCol.GetColTypeFrmString(strType), strName,bAutoInCr);
+                    TableCol col = new TableCol(Integer.parseInt(strID), TableCol.GetColTypeFrmString(strType), strName, bAutoInCr);
                     colVector.add(col);
                 }
                 //Now get sourceNode 
@@ -138,9 +147,11 @@ public class CEngine implements IFaoTableEngine {
                 tbl.SetDataSource(strURL);
                 tbl.SetColumns(colVector);
                 tbl.SetSourceNode(srcNodeVal);
-                if (linkType == 0) {
+                if (linkType == 0 || linkType == 3) {
                     tbl.SetSourceType(CFaoTable.SourceType.Full);
-                    iMainTblIndex = tableCollection.size();
+                    if (linkType == 0) {
+                        iMainTblIndex = tableCollection.size();
+                    }
                 } else {
                     tbl.SetSourceType(CFaoTable.SourceType.Partial);
                 }
@@ -153,6 +164,7 @@ public class CEngine implements IFaoTableEngine {
             return false;
         }
     }
+
     private void DropAllTableInDataBase(Connection conn) {
         try {
             Statement st = conn.createStatement();
@@ -168,7 +180,8 @@ public class CEngine implements IFaoTableEngine {
             System.out.print("Unable to Delete the table in DropAllTableFun" + E);
         }
     }
-        private void ScanOrDeleteDataBase(Connection conn,boolean bDelete) {
+
+    private void ScanOrDeleteDataBase(Connection conn, boolean bDelete) {
         try {
             Statement st = conn.createStatement();
             DatabaseMetaData metadata = conn.getMetaData();
@@ -178,8 +191,8 @@ public class CEngine implements IFaoTableEngine {
                 if (bDelete) {
                     String query = "drop table " + tableName + ";";
                     st.executeUpdate(query);
-                }else{
-                    existingTblMap.put(tableName,1);
+                } else {
+                    existingTblMap.put(tableName, 1);
                 }
             }
             st.close();
