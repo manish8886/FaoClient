@@ -4,8 +4,8 @@
 <col id="1" type="string" primarykey="1">codeISO3</col>
 <col id="2" type="string">codeISO2</col>
 <col id="3" type="string">nameOfficialEN</col>
-<col id="4"	type="string">nameShortEN</col>
-<col id="5"	type="string">nameListEN</col>
+<col id="4" type="string">nameShortEN</col>
+<col id="5" type="string">nameListEN</col>
 <sourcenode>self_governing</sourcenode>
 <link type='0'>http://www.fao.org/countryprofiles/geoinfo/ws/allCountries/EN/</link>
 </table>
@@ -17,9 +17,9 @@
 </table>
 <table name="CoOrdinates" >
 <col id="1" type="real">hasMaxLatitude</col>
-<col id="2"	type="real">hasMaxLongitude</col>
-<col id="3"	type="real">hasMinLatitude</col>
-<col id="4"	type="real">hasMinLongitude</col>
+<col id="2" type="real">hasMaxLongitude</col>
+<col id="3" type="real">hasMinLatitude</col>
+<col id="4" type="real">hasMinLongitude</col>
 <col id="5" type="string" primarykey="1">codeISO3</col>
 <sourcenode>Data</sourcenode>
 <link type='1' tableName = "Countries" fieldId= "1" bindId="5">http://www.fao.org/countryprofiles/geoinfo/ws/countryCoordinates/</link>
@@ -88,8 +88,8 @@
 <col id="1" type="string" primarykey="1">isoAlpha3</col>
 <col id="2" type="string">countryName</col>
 <col id="3" type="string">continentName</col>
-<col id="4"	type="string">capital</col>
-<col id="5"	type="real">population</col>
+<col id="4" type="string">capital</col>
+<col id="5" type="real">population</col>
 <sourcenode>country</sourcenode>
 <link type='3'>http://api.geonames.org/countryInfo?username=manish8886</link>
 </table>
