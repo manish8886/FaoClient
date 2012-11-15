@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <schema>
-
 <table name="Countries">
 <col id="1" type="string" primarykey="1">codeISO3</col>
 <col id="2" type="string">codeISO2</col>
@@ -9,6 +8,12 @@
 <col id="5"	type="string">nameListEN</col>
 <sourcenode>self_governing</sourcenode>
 <link type='0'>http://www.fao.org/countryprofiles/geoinfo/ws/allCountries/EN/</link>
+</table>
+<table name="UnCode" >
+<col id="1" type="integer">codeUN</col>
+<col id="2" type="string" primarykey="1">codeISO3</col>
+<sourcenode>Data</sourcenode>
+<link type='1' tableName = "Countries" fieldId= "1" bindId="5">http://www.fao.org/countryprofiles/geoinfo/ws/countryCodes/UN/</link>
 </table>
 <table name="CoOrdinates" >
 <col id="1" type="real">hasMaxLatitude</col>
@@ -67,7 +72,7 @@
 <table name="BorderCountries" >
 <col id="1" type="integer" autoIncr="1" primarykey="1">RowId</col>
 <col id="2" type="string">nameListEN</col>
-<col id="5" type="string">codeISO3</col>
+<col id="3" type="string">codeISO3</col>
 <sourcenode>self_governing</sourcenode>
 <link type='1' tableName = "Countries" fieldId= "1" bindId="5">http://www.fao.org/countryprofiles/geoinfo/ws/borderWith/</link>
 </table>
