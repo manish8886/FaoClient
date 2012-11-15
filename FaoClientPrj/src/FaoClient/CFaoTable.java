@@ -86,6 +86,7 @@ public class CFaoTable {
             }
             st.executeUpdate(QueryVal);
             System.out.println("Table "+Name+" has been created");
+            SetPrimaryKey(conn, st);
             st.close();
             return true;
         } catch (SQLException E) {
@@ -94,6 +95,28 @@ public class CFaoTable {
         }
     }
 
+    private boolean SetPrimaryKey(Connection conn,Statement st){
+        try {
+            System.out.println("Setting Primary Key For table with name: " + Name);
+            String QueryVal = "alter table " + Name + " add primary key (";
+            for (int index = 0; index < Columns.size(); index++) {
+                TableCol col = Columns.get(index);
+                if (col.IsPrimaryKey()) {
+                    QueryVal += col.GetColName();
+                    QueryVal += ")";
+                    break;
+                }
+
+            }
+            st.executeUpdate(QueryVal);
+            System.out.println("Key has been set for table: "+Name);
+            st.close();
+            return true;
+        } catch (SQLException E) {
+            System.out.println("Key Couldn't be set for "+ Name +". And application is exiting.");
+            return false;
+        }        
+    } 
     public boolean StartLogging(Connection conn, SAXReader reader) {
         if (SrcNodeXML == "" || DataUrl == "") {
             return false;

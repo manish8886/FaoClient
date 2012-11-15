@@ -123,6 +123,16 @@ public class CEngine implements IFaoTableEngine {
                     String strName = colNode.getText();
                     String strID = colNode.selectSingleNode("@id").getText();
                     String strType = colNode.selectSingleNode("@type").getText();
+                    Node keyNode = colNode.selectSingleNode("@primarykey");
+                    String strKey = "0";
+                    if (keyNode != null) {
+                        strKey = keyNode.getText();
+                    }
+                    boolean bKey = false;
+                    if (Integer.parseInt(strKey) == 1) {
+                        bKey = true;
+                    }
+                    
                     Node autoNode = colNode.selectSingleNode("@autoIncr");
                     String strIncr = "0";
                     if (autoNode != null) {
@@ -132,7 +142,7 @@ public class CEngine implements IFaoTableEngine {
                     if (Integer.parseInt(strIncr) == 1) {
                         bAutoInCr = true;
                     }
-                    TableCol col = new TableCol(Integer.parseInt(strID), TableCol.GetColTypeFrmString(strType), strName, bAutoInCr);
+                    TableCol col = new TableCol(Integer.parseInt(strID), TableCol.GetColTypeFrmString(strType), strName, bAutoInCr,bKey);
                     colVector.add(col);
                 }
                 //Now get sourceNode 

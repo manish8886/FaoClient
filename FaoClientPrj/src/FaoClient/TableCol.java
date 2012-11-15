@@ -12,6 +12,7 @@ public class TableCol {
        private  int ColID;
        private ColType DataType;
        private boolean bAutoIncr;
+       private boolean bPrimarykey;
        private String ColName;
        public static String GetTypeString(ColType T){
             switch(T){
@@ -62,15 +63,18 @@ public class TableCol {
 
     }
        
-       public TableCol(int id,ColType type, String Name,boolean b){
+       public TableCol(int id,ColType type, String Name,boolean b,boolean bKey){
            ColID = id;
            DataType = type;
            ColName = Name;
            bAutoIncr = b;
-           
+           bPrimarykey = bKey;
        }
        public boolean IsAutoIncr(){
            return bAutoIncr;
+       }
+       public boolean IsPrimaryKey(){
+           return bPrimarykey;
        }
        public int GetColID(){
             return ColID;
