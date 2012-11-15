@@ -40,8 +40,12 @@ public class FaoClient {
             String userName = console.readLine();
             System.out.println("Enter Password:");
             String passWord = console.readLine();
-//            System.out.println("Do you want to delete existing tables");
-//            String strDeletion = console.readLine();
+            System.out.println("Do you want to delete existing tables.Enter Y or N");
+            String strDeletion = console.readLine();
+            boolean bDelete = true;
+            if(strDeletion.charAt(0)=='N' ||(strDeletion.charAt(0)=='n') ){
+                bDelete = false;
+            }
             String strDbLocation = "jdbc:mysql://";
             Connection conn;
             Class.forName("com.mysql.jdbc.Driver");
@@ -50,7 +54,7 @@ public class FaoClient {
             conn = DriverManager.getConnection(strDbLocation, userName, strPassWord);
             CEngine engineInst = CEngine.CreateEngineInstance();
             if (engineInst.Initialise(conn, "E:\\Data\\Study\\Home\\DIC_PROJ1\\FaoClient\\FaoClientPrj\\PrivateDataFiles\\Main.xml")) {
-                boolean bSuccess = engineInst.Start();
+                boolean bSuccess = engineInst.Start(bDelete);
                 if (bSuccess) {
                     System.out.println("All data has been stored in the database");
                 }

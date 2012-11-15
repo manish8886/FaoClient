@@ -65,7 +65,7 @@ public class CEngine implements IFaoTableEngine {
         }
     }
 
-    public boolean Start() {
+    public boolean Start(boolean bDelete) {
         boolean bStart = true;
         System.out.println("Engine has started");
         //First check is everything is set up for successfully intialisation of the engine
@@ -73,32 +73,46 @@ public class CEngine implements IFaoTableEngine {
             return false;//Engine unable to Start           
         }
         //If we are starting the engine drop all the tables previouly created
+        if(bDelete){
         DropAllTableInDataBase(databaseConnector);
+        }else{
+            StoreCurrTblsName(databaseConnector);
+        }
+        
         //Now Start Creating
         //First we need to create the main table and fill it up so other table can query the data.
         CFaoTable mainTable = tableCollection.get(iMainTblIndex);
         mainTable.SetEngineInstance(this);
-
-        if (!mainTable.CreateTable(databaseConnector)) {
-            return false;//Can't proceed;
+        boolean bContain = existingTblMap.containsKey(mainTable.GetTableName().toLowerCase());
+        if (bDelete || (bContain==false)) {
+            if (!mainTable.CreateTable(databaseConnector)) {
+                return false;//Can't proceed;
+            }
+            if (!mainTable.StartLogging(databaseConnector, xmlReader)) {
+                return false;
+            }
+        }else{
+            System.out.println("Not Creating Table: "+mainTable.GetTableName()+" Already Exists");
         }
-        if (!mainTable.StartLogging(databaseConnector, xmlReader)) {
-            return false;
-        }
-
 
         for (int i = 0; i < tableCollection.size(); i++) {
             if (i == iMainTblIndex) {
                 continue;
             }
             CFaoTable tableOb = tableCollection.get(i);
-            tableOb.SetEngineInstance(this);
-            if (!tableOb.CreateTable(databaseConnector)) {
-                continue;//Skip populating this table
+            String strTblName = tableOb.GetTableName().toLowerCase();
+            boolean bExist= existingTblMap.containsKey(strTblName);
+            if (bDelete || (bExist==false)) {
+                tableOb.SetEngineInstance(this);
+                if (!tableOb.CreateTable(databaseConnector)) {
+                    continue;//Skip populating this table
+                }
+                System.out.println("Fetching the data for " + tableOb.GetTableName() + " Table");
+                tableOb.StartLogging(databaseConnector, xmlReader);
+                System.out.println("Updation of the " + tableOb.GetTableName() + " Table has finished");
+            } else {
+                System.out.println("Not Creating Table: " + tableOb.GetTableName() + " Already Exists");
             }
-            System.out.println("Fetching the data for " + tableOb.GetTableName() + " Table");
-            tableOb.StartLogging(databaseConnector, xmlReader);
-            System.out.println("Updation of the " + tableOb.GetTableName() + " Table has finished");
         }
         return bStart;
     }
@@ -205,6 +219,20 @@ public class CEngine implements IFaoTableEngine {
                     existingTblMap.put(tableName, 1);
                 }
             }
+            st.close();
+        } catch (SQLException E) {
+            System.out.print("Unable to Delete the table in DropAllTableFun" + E);
+        }
+    }
+    private void StoreCurrTblsName(Connection conn) {
+        try {
+            Statement st = conn.createStatement();
+            DatabaseMetaData metadata = conn.getMetaData();
+            ResultSet result = metadata.getTables(null, null, "%", null);
+            while (result.next()) {
+                String tableName = result.getString("TABLE_NAME");
+                existingTblMap.put(tableName, 1);
+             }
             st.close();
         } catch (SQLException E) {
             System.out.print("Unable to Delete the table in DropAllTableFun" + E);
