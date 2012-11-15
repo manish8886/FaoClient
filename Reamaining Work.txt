@@ -1,0 +1,4 @@
+Client:
+1.Table for border countries
+2.Primary Key Constraints
+3.Removing the incomplete columns;
