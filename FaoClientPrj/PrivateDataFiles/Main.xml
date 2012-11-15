@@ -69,6 +69,14 @@
 <sourcenode>GDP</sourcenode>
 <link type='1' tableName = "Countries" fieldId= "1" bindId="5">http://www.fao.org/countryprofiles/geoinfo/ws/countryStatistics/GDP/</link>
 </table>
+<table name="HDI" >
+<col id="1" type="string">Notes</col>
+<col id="2" type="real">Total</col>
+<col id="3" type="integer">Year</col>
+<col id="4" type="string" primarykey="1">codeISO3</col>
+<sourcenode>HDI</sourcenode>
+<link type='1' tableName = "Countries" fieldId= "1" bindId="5">http://www.fao.org/countryprofiles/geoinfo/ws/countryStatistics/HDI/</link>
+</table>
 <table name="BorderCountries" >
 <col id="1" type="integer" autoIncr="1" primarykey="1">RowId</col>
 <col id="2" type="string">nameListEN</col>
