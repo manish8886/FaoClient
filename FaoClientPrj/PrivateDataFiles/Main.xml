@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <schema>
+
 <table name="Countries">
-<col id="1" type="string">codeISO3</col>
+<col id="1" type="string" primarykey="1">codeISO3</col>
 <col id="2" type="string">codeISO2</col>
 <col id="3" type="string">nameOfficialEN</col>
 <col id="4"	type="string">nameShortEN</col>
@@ -9,8 +10,69 @@
 <sourcenode>self_governing</sourcenode>
 <link type='0'>http://www.fao.org/countryprofiles/geoinfo/ws/allCountries/EN/</link>
 </table>
+<table name="CoOrdinates" >
+<col id="1" type="real">hasMaxLatitude</col>
+<col id="2"	type="real">hasMaxLongitude</col>
+<col id="3"	type="real">hasMinLatitude</col>
+<col id="4"	type="real">hasMinLongitude</col>
+<col id="5" type="string" primarykey="1">codeISO3</col>
+<sourcenode>Data</sourcenode>
+<link type='1' tableName = "Countries" fieldId= "1" bindId="5">http://www.fao.org/countryprofiles/geoinfo/ws/countryCoordinates/</link>
+</table>
+<table name="Populations" >
+<col id="1" type="string">populationNotes</col>
+<col id="2" type="real">populationTotal</col>
+<col id="3" type="string">populationUnit</col>
+<col id="4" type="integer">populationYear</col>
+<col id="5" type="string" primarykey="1">codeISO3</col>
+<sourcenode>population</sourcenode>
+<link type='1' tableName = "Countries" fieldId= "1" bindId="5">http://www.fao.org/countryprofiles/geoinfo/ws/countryStatistics/population/</link>
+</table>
+<table name="Area" >
+<col id="1" type="string">Notes</col>
+<col id="2" type="real">Total</col>
+<col id="3" type="string">Unit</col>
+<col id="4" type="integer">Year</col>
+<col id="5" type="string" primarykey="1">codeISO3</col>
+<sourcenode>countryArea</sourcenode>
+<link type='1' tableName = "Countries" fieldId= "1" bindId="5">http://www.fao.org/countryprofiles/geoinfo/ws/countryStatistics/countryArea/</link>
+</table>
+<table name="LandArea" >
+<col id="1" type="string">landAreaNotes</col>
+<col id="2" type="real">landAreaTotal</col>
+<col id="3" type="string">landAreaUnit</col>
+<col id="4" type="integer">landAreaYear</col>
+<col id="5" type="string" primarykey="1">codeISO3</col>
+<sourcenode>landArea</sourcenode>
+<link type='1' tableName = "Countries" fieldId= "1" bindId="5">http://www.fao.org/countryprofiles/geoinfo/ws/countryStatistics/landArea/</link>
+</table>
+<table name="AgriCultureArea" >
+<col id="1" type="string">agriculturalAreaNotes</col>
+<col id="2" type="real">agriculturalAreaTotal</col>
+<col id="3" type="string">agriculturalAreaUnit</col>
+<col id="4" type="integer">agriculturalAreaYear</col>
+<col id="5" type="string" primarykey="1">codeISO3</col>
+<sourcenode>agriculturalArea</sourcenode>
+<link type='1' tableName = "Countries" fieldId= "1" bindId="5">http://www.fao.org/countryprofiles/geoinfo/ws/countryStatistics/agriculturalArea/</link>
+</table>
+<table name="GDP" >
+<col id="1" type="string">GDPNotes</col>
+<col id="2" type="real">GDPTotalInCurrentPrices</col>
+<col id="3" type="string">GDPUnit</col>
+<col id="4" type="integer">GDPYear</col>
+<col id="5" type="string" primarykey="1">codeISO3</col>
+<sourcenode>GDP</sourcenode>
+<link type='1' tableName = "Countries" fieldId= "1" bindId="5">http://www.fao.org/countryprofiles/geoinfo/ws/countryStatistics/GDP/</link>
+</table>
+<table name="BorderCountries" >
+<col id="1" type="integer" autoIncr="1" primarykey="1">RowId</col>
+<col id="2" type="string">nameListEN</col>
+<col id="5" type="string">codeISO3</col>
+<sourcenode>self_governing</sourcenode>
+<link type='1' tableName = "Countries" fieldId= "1" bindId="5">http://www.fao.org/countryprofiles/geoinfo/ws/borderWith/</link>
+</table>
 <table name="FullCountries">
-<col id="1" type="string">countryCode</col>
+<col id="1" type="string" primarykey="1">isoAlpha3</col>
 <col id="2" type="string">countryName</col>
 <col id="3" type="string">continentName</col>
 <col id="4"	type="string">capital</col>
