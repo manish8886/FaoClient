@@ -91,6 +91,17 @@
 <col id="4" type="string">capital</col>
 <col id="5" type="real">population</col>
 <sourcenode>country</sourcenode>
-<link type='3'>http://api.geonames.org/countryInfo?username=manish8886</link>
+<link type='0'>http://api.geonames.org/countryInfo?username=manish8886</link>
+</table>
+<table name="Cities">
+<col id="1" type="string">name</col>
+<col id="2" type="real">lat</col>
+<col id="3" type="real">lng</col>
+<col id="4" type="string">countryName</col>
+<col id="5" type="integer" >geonameId</col>
+<col id="6" type="integer" autoIncr="1" primarykey="1">RowId</col>
+<col id="7" type="string">capital</col>
+<sourcenode>geoname</sourcenode>
+<link type='1' tableName = "FullCountries">http://api.geonames.org/search?maxRows=1&amp;username=manish8886&amp;name_equals=</link>
 </table>
 </schema>
