@@ -17,26 +17,21 @@ import java.util.Map;
  *
  * @author Manish Jain
  */
-public class CEngine implements IFaoTableEngine {
+public class CEngine {
 
     private SAXReader xmlReader;
     private Connection databaseConnector;
     private Vector<CFaoTable> tableCollection;
-    private int iMainTblIndex;
     private String mainFileName;
     private Map<String, Integer> existingTblMap;
-
-    @Override
-    public String GetSourceTableName() {
-        return tableCollection.get(iMainTblIndex).GetTableName();
-    }
+    private Vector<CFaoTable>mainTblVector;
 
     private CEngine() {
         xmlReader = null;
         databaseConnector = null;
         tableCollection = new Vector();
-        iMainTblIndex = -1;
         existingTblMap = new HashMap<String, Integer>();
+        mainTblVector = new Vector();
         mainFileName = "";
     }
 
@@ -81,29 +76,26 @@ public class CEngine implements IFaoTableEngine {
         
         //Now Start Creating
         //First we need to create the main table and fill it up so other table can query the data.
-        CFaoTable mainTable = tableCollection.get(iMainTblIndex);
-        mainTable.SetEngineInstance(this);
-        boolean bContain = existingTblMap.containsKey(mainTable.GetTableName().toLowerCase());
-        if (bDelete || (bContain==false)) {
-            if (!mainTable.CreateTable(databaseConnector)) {
-                return false;//Can't proceed;
+        for (int i = 0; i < mainTblVector.size(); i++) {
+            CFaoTable mainTable = mainTblVector.get(i);
+            boolean bContain = existingTblMap.containsKey(mainTable.GetTableName().toLowerCase());
+            if (bDelete || (bContain == false)) {
+                if (!mainTable.CreateTable(databaseConnector)) {
+                    return false;//Can't proceed;
+                }
+                if (!mainTable.StartLogging(databaseConnector, xmlReader)) {
+                    return false;
+                }
+            } else {
+                System.out.println("Not Creating Table: " + mainTable.GetTableName() + " Already Exists");
             }
-            if (!mainTable.StartLogging(databaseConnector, xmlReader)) {
-                return false;
-            }
-        }else{
-            System.out.println("Not Creating Table: "+mainTable.GetTableName()+" Already Exists");
         }
 
         for (int i = 0; i < tableCollection.size(); i++) {
-            if (i == iMainTblIndex) {
-                continue;
-            }
             CFaoTable tableOb = tableCollection.get(i);
             String strTblName = tableOb.GetTableName().toLowerCase();
             boolean bExist= existingTblMap.containsKey(strTblName);
             if (bDelete || (bExist==false)) {
-                tableOb.SetEngineInstance(this);
                 if (!tableOb.CreateTable(databaseConnector)) {
                     continue;//Skip populating this table
                 }
@@ -161,25 +153,32 @@ public class CEngine implements IFaoTableEngine {
                 }
                 //Now get sourceNode 
                 String tblName = tblNode.selectSingleNode("@name").getText();
+                
                 String srcNodeVal = tblNode.selectSingleNode("sourcenode").getText();
                 Node linkNode = tblNode.selectSingleNode("link");
                 String strURL = linkNode.getText();
                 int linkType = Integer.parseInt(linkNode.selectSingleNode("@type").getText());
+                Node parentTblNode = linkNode.selectSingleNode("@tableName");
+                String strParentTblName ="";
+                if(parentTblNode!=null){
+                    strParentTblName= parentTblNode.getText();
+                }
 
                 CFaoTable tbl = new CFaoTable();
                 tbl.SetTableName(tblName);
                 tbl.SetDataSource(strURL);
                 tbl.SetColumns(colVector);
                 tbl.SetSourceNode(srcNodeVal);
-                if (linkType == 0 || linkType == 3) {
+                tbl.SetParentTblName(strParentTblName);
+
+                if (linkType == 0) {
                     tbl.SetSourceType(CFaoTable.SourceType.Full);
-                    if (linkType == 0) {
-                        iMainTblIndex = tableCollection.size();
-                    }
+                    mainTblVector.add(tbl);
                 } else {
                     tbl.SetSourceType(CFaoTable.SourceType.Partial);
+                    tableCollection.add(tbl);
                 }
-                tableCollection.add(tbl);
+
             }
             return bSuccess;
 
