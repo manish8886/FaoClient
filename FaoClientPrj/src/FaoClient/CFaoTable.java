@@ -24,6 +24,7 @@ public class CFaoTable {
     String SrcNodeXML;
     String DataUrl;
     SourceType Type;
+    String   strParentTblName;
     public IFaoTableEngine IEngine;
 
     enum SourceType {
@@ -37,6 +38,7 @@ public class CFaoTable {
         DataUrl = "";
         Columns = new Vector();
         Type = SourceType.Partial; //Means the URL of the Data Source is not Complete
+        strParentTblName="";
     }
 
     void SetEngineInstance(IFaoTableEngine engine) {
@@ -67,6 +69,9 @@ public class CFaoTable {
         if (t != Type) {
             Type = t;
         }
+    }
+    void SetParentTblName(String name){
+        strParentTblName = name;
     }
 
     boolean CreateTable(Connection conn) {
@@ -134,13 +139,14 @@ public class CFaoTable {
             if (conn == null || reader == null) {
                 return false;
             }
-            String SrcTblName = IEngine.GetSourceTableName();
+//            String SrcTblName = IEngine.GetSourceTableName();
+            
             String srcColName = Columns.get(Columns.size() - 1).GetColName();
             //Partial means, that this table's data link is not complete, and this
             // wil be complete by after taking the data from the other table.We are assuming
             //here we only need the data for the last col of this table and we need to take
             // the data from the firts table of the SrcTable.Somehow, this will become the foregin key here
-            String selectQuery = "select " + srcColName + " from " + SrcTblName;
+            String selectQuery = "select " + srcColName + " from " + strParentTblName;
             Statement st = conn.createStatement();
             ResultSet result = st.executeQuery(selectQuery);
             conn.setAutoCommit(false);
